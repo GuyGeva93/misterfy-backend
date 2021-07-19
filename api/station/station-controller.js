@@ -14,7 +14,9 @@ module.exports = {
 
 async function getStations(req, res) {
   try {
+    console.log('reach backend')
     const stations = await stationService.query()
+    console.log('stations', stations)
     res.send(stations)
   } catch (err) {
     logger.error('Cannot get stations', err)
