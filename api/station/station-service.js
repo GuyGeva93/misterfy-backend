@@ -4,130 +4,130 @@ const asyncLocalStorage = require('../../services/als-service')
 const logger = require('../../services/logger-service')
 
 module.exports = {
-  query,
-  getById,
-  remove,
-  add,
-  update,
-  addSong,
-  removeSong
+    query,
+    getById,
+    remove,
+    add,
+    update,
+    addSong,
+    removeSong
 }
 
 async function query(filterBy = {}) {
-  const criteria = _buildCriteria(filterBy)
-  try {
-    const collection = await dbService.getCollection('station')
-    var stations = await collection.find(criteria).toArray()
-    stations = stations.map(station => {
-      return station
-    })
-    return stations
-  } catch (err) {
-    logger.error('cannot find stations', err)
-    console.log('Error on station service =>', err)
-    throw err
-  }
+    const criteria = _buildCriteria(filterBy)
+    try {
+        const collection = await dbService.getCollection('station')
+        var stations = await collection.find(criteria).toArray()
+        stations = stations.map(station => {
+            return station
+        })
+        return stations
+    } catch (err) {
+        logger.error('cannot find stations', err)
+        console.log('Error on station service =>', err)
+        throw err
+    }
 }
 
 async function getById(stationId) {
-  try {
-    const collection = await dbService.getCollection('station')
-    const station = await collection.findOne({ '_id': ObjectId(stationId) })
-    return station
-  } catch (err) {
-    logger.error(`while finding station ${stationId}`, err)
-    console.log('Error on station service =>', err)
-    throw err
-  }
+    try {
+        const collection = await dbService.getCollection('station')
+        const station = await collection.findOne({ '_id': ObjectId(stationId) })
+        return station
+    } catch (err) {
+        logger.error(`while finding station ${stationId}`, err)
+        console.log('Error on station service =>', err)
+        throw err
+    }
 }
 
 async function remove(stationId) {
-  try {
-    const collection = await dbService.getCollection('station')
-    await collection.deleteOne({ '_id': ObjectId(stationId) })
-  } catch (err) {
-    logger.error(`cannot remove station ${stationId}`, err)
-    console.log('Error on station service =>', err)
-    throw err
-  }
+    try {
+        const collection = await dbService.getCollection('station')
+        await collection.deleteOne({ '_id': ObjectId(stationId) })
+    } catch (err) {
+        logger.error(`cannot remove station ${stationId}`, err)
+        console.log('Error on station service =>', err)
+        throw err
+    }
 }
 
 async function add(station) {
-  try {
-    const stationToAdd = {
-      name: station.name,
-      description: station.description,
-      createdBy: station.createdBy,
-      songs: [],
-      createdAt: Date.now(),
-      imgUrl: station.imgUrl || '',
-      tags: station.tags || []
+    try {
+        const stationToAdd = {
+            name: station.name,
+            description: station.description,
+            createdBy: station.createdBy,
+            songs: [],
+            createdAt: Date.now(),
+            imgUrl: station.imgUrl || '',
+            tags: station.tags || []
+        }
+        const collection = await dbService.getCollection('station')
+        await collection.insertOne(stationToAdd)
+        return stationToAdd;
+    } catch (err) {
+        logger.error('cannot add station', err)
+        console.log('Error on station service =>', err)
+        throw err
     }
-    const collection = await dbService.getCollection('station')
-    await collection.insertOne(stationToAdd)
-    return stationToAdd;
-  } catch (err) {
-    logger.error('cannot add station', err)
-    console.log('Error on station service =>', err)
-    throw err
-  }
 }
 
 async function update(station) {
-  try {
-    // peek only updatable fields!
-    const stationToSave = {
-      _id: ObjectId(station._id),
-      name: station.name,
-      description: station.description,
-      createdBy: station.createdBy,
-      songs: station.songs || [],
-      createdAt: station.createdAt,
-      imgUrl: station.imgUrl || '',
-      tags: station.tags || []
+    try {
+        // peek only updatable fields!
+        const stationToSave = {
+            _id: ObjectId(station._id),
+            name: station.name,
+            description: station.description,
+            createdBy: station.createdBy,
+            songs: station.songs || [],
+            createdAt: station.createdAt,
+            imgUrl: station.imgUrl || '',
+            tags: station.tags || []
+        }
+        const collection = await dbService.getCollection('station')
+        await collection.updateOne({ '_id': stationToSave._id }, { $set: stationToSave })
+        return stationToSave;
+    } catch (err) {
+        logger.error(`cannot update station ${station._id}`, err)
+        console.log('Error on station service =>', err)
+        throw err
     }
-    const collection = await dbService.getCollection('station')
-    await collection.updateOne({ '_id': stationToSave._id }, { $set: stationToSave })
-    return stationToSave;
-  } catch (err) {
-    logger.error(`cannot update station ${station._id}`, err)
-    console.log('Error on station service =>', err)
-    throw err
-  }
 
 }
 
 async function addSong(stationId, song) {
-  try {
-    const collection = await dbService.getCollection('station')
-    return collection.update({ '_id': ObjectId(stationId) }, { $push: { 'songs': song } })
-  } catch (err) {
-    logger.error(`cannot add song ${song.id}`, err)
-    console.log('Error on station service =>', err)
-    throw err
-  }
+    try {
+        const collection = await dbService.getCollection('station')
+        return await collection.update({ '_id': ObjectId(stationId) }, { $push: { 'songs': song } })
+    } catch (err) {
+        logger.error(`cannot add song ${song.id}`, err)
+        console.log('Error on station service =>', err)
+        throw err
+    }
 }
 async function removeSong(stationId, song) {
-  try {
-    const collection = await dbService.getCollection('station')
-    return collection.update({ '_id': ObjectId(stationId) }, { $pull: { 'songs': song } })
-  } catch (err) {
-    logger.error(`cannot remove song ${song.id}`, err)
-    console.log('Error on station service =>', err)
-  }
+    try {
+        const collection = await dbService.getCollection('station')
+        return collection.update({ '_id': ObjectId(stationId) }, { $pull: { 'songs': song } })
+    } catch (err) {
+        logger.error(`cannot remove song ${song.id}`, err)
+        console.log('Error on station service =>', err)
+    }
 }
 
 function _buildCriteria(filterBy) {
-  const criteria = {}
-  if (filterBy.name) {
-    const nameCriteria = { $regex: filterBy.name, $options: 'i' }
-    console.log(nameCriteria, 'criteria');
-    criteria.name = nameCriteria;
+    const criteria = {}
+    if (filterBy.name) {
+        const nameCriteria = { $regex: filterBy.name, $options: 'i' }
+        console.log(nameCriteria, 'criteria');
+        criteria.name = nameCriteria;
 
-  }
-  if (filterBy.tag !== 'All') {
-    const tagCriteria = (filterBy.tag)
-    criteria.tag = tagCriteria
-  }
-  return criteria
+    }
+    if (filterBy.tag !== 'All') {
+        const tagCriteria = (filterBy.tag)
+        criteria.tag = tagCriteria
+    }
+    return criteria
 }
