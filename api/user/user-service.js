@@ -1,6 +1,6 @@
 const dbService = require('../../services/db-service')
 const logger = require('../../services/logger-service')
-// const reviewService = require('../review/review-service')
+    // const reviewService = require('../review/review-service')
 const bcrypt = require('bcrypt')
 const ObjectId = require('mongodb').ObjectId
 
@@ -111,6 +111,7 @@ async function add(user) {
         throw err
     }
 }
+
 
 function _buildCriteria(filterBy) {
     const criteria = {}

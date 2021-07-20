@@ -9,7 +9,9 @@ module.exports = {
     addStation,
     updateStation,
     addSong,
-    removeSong
+    removeSong,
+    getChatMsgs,
+    addChatMsg
 }
 
 async function getStations(req, res) {
@@ -25,7 +27,6 @@ async function getStations(req, res) {
 }
 
 async function getStation(req, res) {
-    console.dir(req.params);
     try {
         const station = await stationService.getById(req.params.id)
         res.send(station)
@@ -64,6 +65,8 @@ async function addStation(req, res) {
 }
 
 
+
+
 async function updateStation(req, res) {
     try {
         const station = req.body
@@ -100,5 +103,29 @@ async function removeSong(req, res) {
         logger.error('Failed to remove a song from this station', err)
         console.log('Error on station controller =>', err)
         res.status(500).send({ err: 'Failed to remove a song from this station' })
+    }
+}
+
+async function getChatMsgs(req, res) {
+    try {
+        const msgs = await stationService.getChatMsgs(req.params.id);
+        res.send(msgs)
+    } catch (err) {
+        logger.error('Cannot get messages', err)
+        console.log('Error on station controller =>', err)
+        res.status(500).send({ err: 'Failed to get messages' })
+    }
+}
+
+async function addChatMsg(req, res) {
+    try {
+        const newMsg = req.body;
+        const savedStation = await stationService.addChatMsg(req.params.id, newMsg);
+        res.send(savedStation);
+
+    } catch (err) {
+        logger.error('Failed to add a message to this station', err)
+        console.log('Error on station controller =>', err)
+        res.status(500).send({ err: 'Failed to add a message to this station' })
     }
 }

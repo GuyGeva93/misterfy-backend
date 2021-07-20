@@ -10,7 +10,9 @@ module.exports = {
     add,
     update,
     addSong,
-    removeSong
+    removeSong,
+    getChatMsgs,
+    addChatMsg
 }
 
 async function query(filterBy = {}) {
@@ -84,7 +86,8 @@ async function update(station) {
             songs: station.songs || [],
             createdAt: station.createdAt,
             imgUrl: station.imgUrl || '',
-            tags: station.tags || []
+            tags: station.tags || [],
+            msgs: station.msgs || []
         }
         const collection = await dbService.getCollection('station')
         await collection.updateOne({ '_id': stationToSave._id }, { $set: stationToSave })
@@ -119,6 +122,28 @@ async function removeSong(stationId, song) {
     }
 }
 
+async function getChatMsgs(stationId) {
+    try {
+        const station = await getById(stationId);
+        const msgs = station.msgs || [];
+        return msgs;
+    } catch (err) {
+        console.log('Cant get messages', err);
+    }
+}
+
+async function addChatMsg(stationId, msg) {
+    try {
+        const collection = await dbService.getCollection('station')
+        await collection.updateOne({ '_id': ObjectId(stationId) }, { $push: { 'msgs': msg } })
+        return await collection.findOne(ObjectId(stationId));
+    } catch (err) {
+        logger.error(`cannot add message ${song.id}`, err)
+        console.log('Error on station service =>', err)
+    }
+}
+
+
 function _buildCriteria(filterBy) {
     const criteria = {}
     if (filterBy.name) {
@@ -128,7 +153,6 @@ function _buildCriteria(filterBy) {
     }
     if (filterBy.tag && filterBy.tag !== 'All') {
         const tagCriteria = filterBy.tag;
-        console.log(tagCriteria);
         criteria.tags = tagCriteria
     }
     return criteria
