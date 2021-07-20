@@ -16,19 +16,22 @@ module.exports = {
 }
 
 async function query(filterBy = {}) {
-  const criteria = _buildCriteria(JSON.parse(filterBy))
-  try {
-    const collection = await dbService.getCollection('station')
-    var stations = await collection.find(criteria).toArray()
-    stations = stations.map(station => {
-      return station
-    })
-    return stations
-  } catch (err) {
-    logger.error('cannot find stations', err)
-    console.log('Error on station service =>', err)
-    throw err
-  }
+    const criteria = _buildCriteria(JSON.parse(filterBy))
+    let tags;
+
+    try {
+        const collection = await dbService.getCollection('station')
+        var stations = await collection.find(criteria).toArray()
+            //Getting the tags when we can get all the stations
+        if (!Object.keys(criteria).length) {
+            tags = _getUniqeTags(stations);
+        }
+        return { stations, tags };
+    } catch (err) {
+        logger.error('cannot find stations', err)
+        console.log('Error on station service =>', err)
+        throw err
+    }
 }
 
 async function getById(stationId) {
@@ -150,10 +153,20 @@ function _buildCriteria(filterBy) {
     const nameCriteria = { $regex: filterBy.name, $options: 'i' }
     criteria.name = nameCriteria;
 
-  }
-  if (filterBy.tag && filterBy.tag !== 'All') {
-    const tagCriteria = filterBy.tag;
-    criteria.tags = tagCriteria
-  }
-  return criteria
+    }
+    if (filterBy.tag && filterBy.tag !== 'All') {
+        const tagCriteria = filterBy.tag;
+        criteria.tags = tagCriteria
+    }
+    return criteria
+}
+
+function _getUniqeTags(stations) {
+    tags = stations.reduce(
+        (acc, station) => {
+            acc.push(...station.tags);
+            return acc;
+        }, []
+    );
+    return Array.from(new Set(tags));
 }

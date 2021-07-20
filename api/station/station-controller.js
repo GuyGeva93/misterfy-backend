@@ -15,15 +15,15 @@ module.exports = {
 }
 
 async function getStations(req, res) {
-  try {
-    const { filterBy } = req.query;
-    const stations = await stationService.query(filterBy)
-    res.send(stations)
-  } catch (err) {
-    logger.error('Cannot get stations', err)
-    console.log('Error on station controller =>', err)
-    res.status(500).send({ err: 'Failed to get stations' })
-  }
+    try {
+        const { filterBy } = req.query;
+        const data = await stationService.query(filterBy)
+        res.send(data)
+    } catch (err) {
+        logger.error('Cannot get stations', err)
+        console.log('Error on station controller =>', err)
+        res.status(500).send({ err: 'Failed to get stations' })
+    }
 }
 
 async function getStation(req, res) {
