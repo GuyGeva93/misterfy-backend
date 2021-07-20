@@ -40,6 +40,7 @@ function connectSockets(http, session) {
                 // emits only to sockets in the same room
                 // addChatMsg(socket.topic, msg);
                 gIo.to(socket.myTopic).emit('chat addMsg');
+                // emitToAll('chat addMsg',msg,socket.topic);
             })
             // socket.on('setTyping', typingUser => {
             //     socket.to(socket.myTopic).emit('user is typing', typingUser);
@@ -53,6 +54,7 @@ function connectSockets(http, session) {
 }
 
 function emitToAll({ type, data, room = null }) {
+    console.log(type);
     if (room) gIo.to(room).emit(type, data)
     else gIo.emit(type, data)
 }

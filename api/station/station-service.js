@@ -17,13 +17,16 @@ module.exports = {
 
 async function query(filterBy = {}) {
     const criteria = _buildCriteria(JSON.parse(filterBy))
+    let tags;
+
     try {
         const collection = await dbService.getCollection('station')
         var stations = await collection.find(criteria).toArray()
-        stations = stations.map(station => {
-            return station
-        })
-        return stations
+            //Getting the tags when we can get all the stations
+        if (!Object.keys(criteria).length) {
+            tags = _getUniqeTags(stations);
+        }
+        return { stations, tags };
     } catch (err) {
         logger.error('cannot find stations', err)
         console.log('Error on station service =>', err)
@@ -156,4 +159,14 @@ function _buildCriteria(filterBy) {
         criteria.tags = tagCriteria
     }
     return criteria
+}
+
+function _getUniqeTags(stations) {
+    tags = stations.reduce(
+        (acc, station) => {
+            acc.push(...station.tags);
+            return acc;
+        }, []
+    );
+    return Array.from(new Set(tags));
 }
