@@ -1,6 +1,6 @@
 const logger = require('../../services/logger-service')
 const stationService = require('../station/station-service')
-    // const socketService = require('../../services/socket-service')
+const socketService = require('../../services/socket-service')
 
 module.exports = {
     getStations,
@@ -8,8 +8,8 @@ module.exports = {
     deleteStation,
     addStation,
     updateStation,
-    addSong,
-    removeSong,
+    // addSong,
+    // removeSong,
     getChatMsgs,
     addChatMsg
 }
@@ -70,8 +70,8 @@ async function updateStation(req, res) {
     try {
         const station = req.body
         const savedStation = await stationService.update(station)
+        socketService.broadcast({ type: 'station updated', data: station, room: savedStation._id })
         res.send(savedStation)
-            // socketService.broadcast({ type: 'station-updated', data: station, to: savedStation._id })
     } catch (err) {
         logger.error('Failed to update station', err)
         console.log('Error on station controller =>', err)
@@ -79,31 +79,34 @@ async function updateStation(req, res) {
     }
 }
 
-async function addSong(req, res) {
-    try {
-        const song = req.body;
-        const savedStation = await stationService.addSong(req.params.id, song);
-        res.send(savedStation);
+// async function addSong(req, res) {
+//     try {
+//         const song = req.body;
+//         const savedStation = await stationService.addSong(req.params.id, song);
+//         socketService.broadcast({ type: 'refresh station', data: savedStation })
+//         res.send(savedStation);
 
-    } catch (err) {
-        logger.error('Failed to add a song to this station', err)
-        console.log('Error on station controller =>', err)
-        res.status(500).send({ err: 'Failed to add a song to this station' })
-    }
-}
-async function removeSong(req, res) {
-    try {
-        const song = req.body;
+//     } catch (err) {
+//         logger.error('Failed to add a song to this station', err)
+//         console.log('Error on station controller =>', err)
+//         res.status(500).send({ err: 'Failed to add a song to this station' })
+//     }
+// }
+// async function removeSong(req, res) {
+//     try {
+//         const song = req.body;
 
-        const savedStation = await stationService.removeSong(req.params.id, song);
-        res.send(savedStation);
+//         const savedStation = await stationService.removeSong(req.params.id, song);
+//         socketService.broadcast({ type: 'refresh station', data: savedStation })
+//         console.log(savedStation);
+//         res.send(savedStation);
 
-    } catch (err) {
-        logger.error('Failed to remove a song from this station', err)
-        console.log('Error on station controller =>', err)
-        res.status(500).send({ err: 'Failed to remove a song from this station' })
-    }
-}
+//     } catch (err) {
+//         logger.error('Failed to remove a song from this station', err)
+//         console.log('Error on station controller =>', err)
+//         res.status(500).send({ err: 'Failed to remove a song from this station' })
+//     }
+// }
 
 async function getChatMsgs(req, res) {
     try {
