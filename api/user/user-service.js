@@ -13,11 +13,11 @@ module.exports = {
     add
 }
 
-async function query(filterBy = {}) {
-    const criteria = _buildCriteria(filterBy)
+async function query() {
+    // const criteria = {}
     try {
         const collection = await dbService.getCollection('user')
-        var users = await collection.find(criteria).toArray()
+        var users = await collection.find().toArray()
         users = users.map(user => {
             delete user.password
             user.createdAt = ObjectId(user._id).getTimestamp()
@@ -93,14 +93,12 @@ async function update(user) {
 
 async function add(user) {
     try {
-        const saltRounds = 10;
-        const hash = await bcrypt.hash(user.password, saltRounds)
-            // peek only updatable fields!
+
+        // peek only updatable fields!
         const userToAdd = {
             username: user.username,
-            password: hash,
-            fullname: user.fullname,
-            isAdmin: false
+            password: user.password,
+            fullname: user.fullname
         }
         const collection = await dbService.getCollection('user')
         await collection.insertOne(userToAdd)

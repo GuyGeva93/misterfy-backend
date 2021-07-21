@@ -5,10 +5,10 @@ const logger = require('../../services/logger-service')
 
 async function getUsers(req, res) {
     try {
-        const filterBy = {
-            // txt: req.query.txt || '',
-            // minBalance: +req.query.minBalance || 0
-        }
+        // const filterBy = {
+        //     // txt: req.query.txt || '',
+        //     // minBalance: +req.query.minBalance || 0
+        // }
         const users = await userService.query()
         res.send(users)
     } catch (err) {
@@ -24,17 +24,6 @@ async function getUser(req, res) {
     } catch (err) {
         logger.error('Failed to get user', err)
         res.status(500).send({ err: 'Failed to get user' })
-    }
-}
-async function addUser(req, res) {
-    try {
-        const user = req.body;
-        const savedUser = await userService.add(user)
-        res.send(savedUser)
-        socketService.broadcast({ type: 'user-added', to: savedUser._id })
-    } catch (err) {
-        logger.error('Failed to add user', err)
-        res.status(500).send({ err: 'Failed to add user' })
     }
 }
 
@@ -64,6 +53,5 @@ module.exports = {
     getUsers,
     getUser,
     deleteUser,
-    addUser,
     updateUser
 }
