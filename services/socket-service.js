@@ -49,6 +49,9 @@ function connectSockets(http, session) {
         socket.on('user-watch', userId => {
             socket.join(userId)
         })
+        socket.on('remove song', updatedStation => {
+            gIo.to(socket.myTopic).emit('removed song', updatedStation);
+        })
 
     })
 }
