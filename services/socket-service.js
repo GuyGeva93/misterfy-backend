@@ -1,3 +1,4 @@
+const { updateStation } = require('../api/station/station-controller');
 const asyncLocalStorage = require('./als-service');
 const logger = require('./logger-service');
 
@@ -5,15 +6,8 @@ var gIo = null
 
 function connectSockets(http, session) {
     gIo = require('socket.io')(http);
-    const sharedSession = require('express-socket.io-session');
-
-    gIo.use(sharedSession(session, {
-        autoSave: true
-    }));
     gIo.on('connection', socket => {
-        console.log('New socket - socket.handshake.sessionID', socket.handshake.sessionID)
-        _printSocket(socket);
-        // if (socket.handshake?.session?.user) socket.join(socket.handshake.session.user._id)
+        console.log('New socket', socket.id)
         socket.on('disconnect', socket => {
             console.log('Someone disconnected')
         })
@@ -23,7 +17,6 @@ function connectSockets(http, session) {
                 socket.leave(socket.myTopic)
             }
             socket.join(topic)
-                // logger.debug('Session ID is', socket.handshake.sessionID)
             socket.myTopic = topic
         })
         socket.on('chat newMsg', msg => {
@@ -32,57 +25,75 @@ function connectSockets(http, session) {
             // emits only to sockets in the same room
             gIo.to(socket.myTopic).emit('chat addMsg', msg)
         })
-        socket.on('user-watch', userId => {
-            socket.join(userId)
+        socket.on('chat newMsg', msg => {
+            // emits to all sockets:
+            // gIo.emit('chat addMsg', msg)
+            // emits only to sockets in the same room
+            gIo.to(socket.myTopic).emit('chat addMsg', msg)
+        })
+        socket.on('station watch', stationId => {
+            if (socket.stationId === stationId) return;
+            if (socket.stationId) {
+                socket.leave(socket.stationId);
+            }
+            // socket.join('watching:' + stationId)
+            socket.join(stationId)
+            socket.stationId = stationId;
+        })
+        socket.on('set-station-socket', stationId => {
+            logger.debug(`Setting socket.stationId = ${stationId}`)
+            socket.stationId = stationId
+        })
+        socket.on('unset-station-socket', () => {
+            delete socket.stationId
+        })
+        socket.on('station updated', (updatedStation) => {
+            // console.log(updatedStation, 'station id');
+            socket.to(updatedStation._id).emit("station updated", updatedStation);
         })
 
     })
 }
-
-function emitToAll({ type, data, room = null }) {
-    if (room) gIo.to(room).emit(type, data)
+//label===stationId
+function emitTo({ type, data, label }) {
+    console.log(gIo.to(label).clients((err, clients) => {
+        if (err) throw err;
+        console.log(clients.sockets);
+    }))
+    if (label) gIo.to(label).emit(type, data)
     else gIo.emit(type, data)
 }
 
-// TODO: Need to test emitToUser feature
 function emitToUser({ type, data, userId }) {
-    const sockets = _getAllSockets()
-    const socket = sockets.find(s => s.handshake.session.user._id == userId)
-        // const socket = sockets.find(s => {
-        //     // if (!s.handshake) return logger.debug('No handshake')
-        //     // if (!s.handshake.session) return logger.debug('No handshake.session')
-        //     // if (!s.handshake.session.user) return logger.debug('No handshake.session.user')
-        //     // return s.handshake.session.user._id === userId
-        // })
-    if (!socket) {
-        logger.debug('Socket not found for user: ' + userId)
-        _printSockets();
-        return
-    }
     logger.debug('Emiting to user socket: ' + userId)
-    socket.emit(type, data)
+    const socket = _getUserSocket(userId)
+    if (socket) socket.emit(type, data)
+    else {
+        console.log('User socket not found');
+        _printSockets();
+    }
 }
 
-
 // Send to all sockets BUT not the current socket 
-function broadcast({ type, data, room = null }) {
-    const store = asyncLocalStorage.getStore()
-    const { sessionId } = store
-    if (!sessionId) return logger.debug('Shoudnt happen, no sessionId in asyncLocalStorage store')
-
-    const sockets = _getAllSockets()
-    const excludedSocket = sockets.find(socket => socket.handshake.sessionID === sessionId)
+function broadcast({ type, data, room = null, stationId }) {
+    const excludedSocket = _getStationSocket(stationId)
     if (!excludedSocket) {
         logger.debug('Shouldnt happen, socket not found')
         _printSockets();
         return;
     }
-    logger.debug('broadcast to all but session: ', sessionId)
+    logger.debug('broadcast to all but user: ', stationId)
     if (room) {
         excludedSocket.broadcast.to(room).emit(type, data)
     } else {
         excludedSocket.broadcast.emit(type, data)
     }
+}
+
+function _getStationSocket(stationId) {
+    const sockets = _getAllSockets();
+    const socket = sockets.find(s => s.stationId == stationId)
+    return socket;
 }
 
 function _getAllSockets() {
@@ -98,17 +109,12 @@ function _printSockets() {
 }
 
 function _printSocket(socket) {
-    var msg = 'Socket - sessionId:' + socket.handshake.sessionID
-    if (socket.handshake.session.user) {
-        const { user } = socket.handshake.session
-        msg += ` With session for user: ${user.fullname} (_id=${user._id})`
-    }
-    console.log(msg)
+    console.log(`Socket - socketId: ${socket.id} userId: ${socket.userId}`)
 }
 
 module.exports = {
     connectSockets,
-    emitToAll,
+    emitTo,
     emitToUser,
     broadcast,
 }

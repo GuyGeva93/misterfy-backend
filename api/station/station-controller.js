@@ -70,7 +70,7 @@ async function updateStation(req, res) {
     try {
         const station = req.body
         const savedStation = await stationService.update(station)
-        socketService.broadcast({ type: 'station updated', data: station, room: savedStation._id })
+            // socketService.emitTo({ type: 'station updated1', data: savedStation, label: station._id });
         res.send(savedStation)
     } catch (err) {
         logger.error('Failed to update station', err)
