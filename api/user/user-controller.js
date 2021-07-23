@@ -54,6 +54,4 @@ module.exports = {
   getUser,
   deleteUser,
   updateUser,
-  // likedSong,
-  // likedStation
 }

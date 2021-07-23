@@ -41,11 +41,11 @@ async function getById(userId) {
     const user = await collection.findOne({ '_id': ObjectId(userId) })
     delete user.password
 
-    user.reviews = await reviewService.query({ byUserId: ObjectId(user._id) })
-    user.reviews = user.reviews.map(review => {
-      delete review.byUser
-      return review
-    })
+    // user.reviews = await reviewService.query({ byUserId: ObjectId(user._id) })
+    // user.reviews = user.reviews.map(review => {
+    //   delete review.byUser
+    //   return review
+    // })
     return user
   } catch (err) {
     logger.error(`while finding user ${userId}`, err)
@@ -76,7 +76,7 @@ async function remove(userId) {
 async function update(user) {
   // const isAdmin = JSON.parse(user.isAdmin);
   // console.log(isAdmin);
-  const { username, fullname, likedSongs, likedStations } = user
+  const { username, fullname, likedStations } = user
   try {
     // peek only updatable fields!
     const userToSave = {
@@ -84,7 +84,7 @@ async function update(user) {
       username,
       fullname,
       // isAdmin
-      likedSongs,
+      // likedSongs,
       likedStations
     }
     const collection = await dbService.getCollection('user')
@@ -97,13 +97,13 @@ async function update(user) {
 }
 
 async function add(user) {
-  const { username, password, fullname, likedSongs, likedStations } = user
+  const { username, password, fullname, likedStations } = user
   try {
     const userToAdd = {
       username,
       password,
       fullname,
-      likedSongs,
+      // likedSongs,
       likedStations
     }
     const collection = await dbService.getCollection('user')
