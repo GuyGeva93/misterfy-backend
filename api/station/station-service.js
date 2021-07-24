@@ -1,7 +1,7 @@
 const dbService = require('../../services/db-service')
 const ObjectId = require('mongodb').ObjectId
 const asyncLocalStorage = require('../../services/als-service')
-const logger = require('../../services/logger-service')
+// const logger = require('../../services/logger-service')
 
 module.exports = {
   query,
@@ -41,7 +41,7 @@ async function getById(stationId) {
     const station = await collection.findOne({ '_id': ObjectId(stationId) })
     return station
   } catch (err) {
-    logger.error(`while finding station ${stationId}`, err)
+    // logger.error(`while finding station ${stationId}`, err)
     console.log('Error on station service =>', err)
     throw err
   }
@@ -52,7 +52,7 @@ async function remove(stationId) {
     const collection = await dbService.getCollection('station')
     await collection.deleteOne({ '_id': ObjectId(stationId) })
   } catch (err) {
-    logger.error(`cannot remove station ${stationId}`, err)
+    // logger.error(`cannot remove station ${stationId}`, err)
     console.log('Error on station service =>', err)
     throw err
   }
@@ -74,7 +74,7 @@ async function add(station) {
     await collection.insertOne(stationToAdd)
     return stationToAdd;
   } catch (err) {
-    logger.error('cannot add station', err)
+    // logger.error('cannot add station', err)
     console.log('Error on station service =>', err)
     throw err
   }
@@ -100,7 +100,7 @@ async function update(station) {
     await collection.updateOne({ '_id': stationToSave._id }, { $set: stationToSave })
     return stationToSave;
   } catch (err) {
-    logger.error(`cannot update station ${station._id}`, err)
+    // logger.error(`cannot update station ${station._id}`, err)
     console.log('Error on station service =>', err)
     throw err
   }
@@ -145,7 +145,7 @@ async function addChatMsg(stationId, msg) {
     await collection.updateOne({ '_id': ObjectId(stationId) }, { $push: { 'msgs': msg } })
     return await collection.findOne(ObjectId(stationId));
   } catch (err) {
-    logger.error(`cannot add message ${song.id}`, err)
+    // logger.error(`cannot add message ${song.id}`, err)
     console.log('Error on station service =>', err)
   }
 }
