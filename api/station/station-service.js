@@ -67,7 +67,7 @@ async function add(station) {
       createdAt: Date.now(),
       imgUrl: station.imgUrl || '',
       tags: station.tags || [],
-      likedByUsers: station.likedByUsers || []
+      likedByUsers: station.likedByUsers
     }
     const collection = await dbService.getCollection('station')
     await collection.insertOne(stationToAdd)
@@ -92,7 +92,7 @@ async function update(station) {
       imgUrl: station.imgUrl || '',
       tags: station.tags || [],
       msgs: station.msgs || [],
-      likedByUsers: station.likedByUsers || []
+      likedByUsers: station.likedByUsers
 
     }
     const collection = await dbService.getCollection('station')

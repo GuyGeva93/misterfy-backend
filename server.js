@@ -61,7 +61,7 @@ connectSockets(http, session)
 
 const logger = require('./services/logger-service')
 const port = process.env.PORT || 3030
-http.listen(port, () => {
+app.listen(port, () => {
     logger.info('Server is running on port: ' + port)
 })
 
