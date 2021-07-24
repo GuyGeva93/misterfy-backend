@@ -6,6 +6,7 @@ const expressSession = require('express-session')
 const app = express()
 app.get('/api/test', (req, res) => {
     console.log('OK')
+    res.send('OK')
 })
 const http = require('http').createServer(app)
 
