@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.ebfea791b4a0d5addd3b2035e004b2c5.js"
+  "/precache-manifest.f947aebcb588d62b9a921a6a952d4351.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "misterfy"});

@@ -4,6 +4,9 @@ const path = require('path')
 const expressSession = require('express-session')
 
 const app = express()
+app.get('/api/test', (req, res) => {
+    console.log('OK')
+})
 const http = require('http').createServer(app)
 
 const session = expressSession({
@@ -49,7 +52,7 @@ app.get('/api/setup-session', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 // app.use('/api/review', reviewRoutes)
-app.use('/api', stationRoutes)
+app.use('/api/station', stationRoutes)
 connectSockets(http, session)
 
 
