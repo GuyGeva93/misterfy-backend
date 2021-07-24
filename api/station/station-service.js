@@ -16,6 +16,7 @@ module.exports = {
 }
 
 async function query(filterBy = {}) {
+  console.log('FILTER BY', filterBy)
   const criteria = _buildCriteria(JSON.parse(filterBy))
   let tags;
 
