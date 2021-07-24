@@ -49,7 +49,7 @@ app.get('/api/setup-session', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 // app.use('/api/review', reviewRoutes)
-app.use('/api/station', stationRoutes)
+app.use('/api', stationRoutes)
 connectSockets(http, session)
 
 
