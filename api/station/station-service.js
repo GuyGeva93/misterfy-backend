@@ -29,7 +29,7 @@ async function query(filterBy = {}) {
     }
     return { stations, tags };
   } catch (err) {
-    logger.error('cannot find stations', err)
+    // logger.error('cannot find stations', err)
     console.log('Error on station service =>', err)
     throw err
   }
