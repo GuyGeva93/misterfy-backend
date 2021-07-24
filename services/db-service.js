@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient
-const logger = require('../../services/logger-service')
+const logger = require('../services/logger-service')
 
 const config = require('../config')
 
@@ -19,6 +19,7 @@ async function getCollection(collectionName) {
         return collection
     } catch (err) {
         logger.error('Failed to get Mongo collection', err)
+        console.log('Failed to get Mongo collection', err)
         throw err
     }
 }
@@ -32,6 +33,7 @@ async function connect() {
         return db
     } catch (err) {
         logger.error('Cannot Connect to DB', err)
+        console.log('Cannot Connect to DB', err)
         throw err
     }
 }
