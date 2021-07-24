@@ -7,20 +7,23 @@ const app = express()
 const http = require('http').createServer(app)
 
 const session = expressSession({
-        secret: 'coding is amazing',
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false }
-    })
-    // Express App Config
+    secret: 'coding is amazing',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+})
+// Express App Config
 app.use(express.json())
 app.use(session)
+app.use(express.static('public'))
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve(__dirname, 'public')))
 } else {
     const corsOptions = {
-        origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://localhost:8081', 'http://127.0.0.1:3030', 'http://localhost:3030'],
+        origin: ['http://127.0.0.1:8080', 'http://localhost:8080',
+            'http://localhost:8081', 'http://127.0.0.1:3030', 'http://localhost:3030',
+            'http://192.168.1.22:8081', 'http://192.168.1.22:8080'],
         credentials: true
     }
     app.use(cors(corsOptions))
@@ -28,7 +31,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const authRoutes = require('./api/auth/auth-routes')
 const userRoutes = require('./api/user/user-routes')
-    // const reviewRoutes = require('./api/review/review.routes')
+// const reviewRoutes = require('./api/review/review.routes')
 const stationRoutes = require('./api/station/station-routes')
 const { connectSockets } = require('./services/socket-service')
 
@@ -45,7 +48,7 @@ app.get('/api/setup-session', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
-    // app.use('/api/review', reviewRoutes)
+// app.use('/api/review', reviewRoutes)
 app.use('/api/station', stationRoutes)
 connectSockets(http, session)
 
