@@ -18,8 +18,6 @@ module.exports = {
 async function query(filterBy = {}) {
     // console.log('FILTER BY', filterBy)
     const criteria = _buildCriteria(JSON.parse(filterBy))
-    let tags;
-
     try {
         const collection = await dbService.getCollection('station')
         var filteredStations = await collection.find(criteria).toArray()
@@ -166,12 +164,12 @@ function _buildCriteria(filterBy) {
     return criteria
 }
 
-function _getUniqeTags(stations) {
-    tags = stations.reduce(
-        (acc, station) => {
-            acc.push(...station.tags);
-            return acc;
-        }, []
-    );
-    return Array.from(new Set(tags));
-}
+// function _getUniqeTags(stations) {
+//     tags = stations.reduce(
+//         (acc, station) => {
+//             acc.push(...station.tags);
+//             return acc;
+//         }, []
+//     );
+//     return Array.from(new Set(tags));
+// }

@@ -48,7 +48,6 @@ function connectSockets(http, session) {
             delete socket.stationId
         })
         socket.on('station updated', (updatedStation) => {
-            // console.log(updatedStation, 'station id');
             socket.to(updatedStation._id).emit("station updated", updatedStation);
         })
 
