@@ -76,15 +76,14 @@ async function remove(userId) {
 async function update(user) {
     // const isAdmin = JSON.parse(user.isAdmin);
     // console.log(isAdmin);
-    const { username, fullname, likedStations } = user
+    const { username, fullname, likedStations, imgUrl } = user
     try {
         // peek only updatable fields!
         const userToSave = {
             _id: ObjectId(user._id),
             username,
             fullname,
-            // isAdmin
-            // likedSongs,
+            imgUrl,
             likedStations
         }
         const collection = await dbService.getCollection('user')
